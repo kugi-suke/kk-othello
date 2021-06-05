@@ -65,21 +65,24 @@ class Game extends React.Component {
     });
   }
 
-  checkCol(current, color, idCol, idRow) {
+  checkCol(current, color, idCol, idRow, direction) {
     let reverseFlag = true;
     let downer = [];
     let reverseList = [];
+    let point = null;
+    let axis = direction==='col' ? idRow : idCol;
 
-    for (let j=idRow-1; j>=0; j--) {
-      if (current[j*8 + idCol]===color) {
+    for (let j=axis-1; j>=0; j--) {
+      point = direction==='col' ? j*8 + idCol : idRow*8 + j;
+      if (current[point]===color) {
         if (!reverseFlag) {
           reverseFlag = !reverseFlag;
         }
         break;
-      } else if (current[j*8 + idCol]==null) {
+      } else if (current[point]==null) {
         break;
       } else {
-        reverseList.push(j*8 + idCol);
+        reverseList.push(point);
         reverseFlag = false;
       }
     }
@@ -87,16 +90,17 @@ class Game extends React.Component {
     if (!reverseFlag) reverseList = [];
     reverseFlag = true;
 
-    for (let j=idRow+1; j<8; j++) {
-      if (current[j*8 + idCol]===color) {
+    for (let j=axis+1; j<8; j++) {
+      point = direction==='col' ? j*8 + idCol : idRow*8 + j;
+      if (current[point]===color) {
         if (!reverseFlag) {
           reverseFlag = !reverseFlag;
         }
         break;
-      } else if (current[j*8 + idCol]==null) {
+      } else if (current[point]==null) {
         break;
       } else {
-        downer.push(j*8 + idCol);
+        downer.push(point);
         reverseFlag = false;
       }
     }
@@ -109,49 +113,7 @@ class Game extends React.Component {
     return reverseList;
   }
 
-  checkRow(current, color, idCol, idRow) {
-    let reverseFlag = true;
-    let righter = [];
-    let reverseList = [];
 
-    for (let j=idCol-1; j>=0; j--) {
-      if (current[idRow*8 + j]===color) {
-        if (!reverseFlag) {
-          reverseFlag = !reverseFlag;
-        }
-        break;
-      } else if (current[idRow*8 + j]==null) {
-        break;
-      } else {
-        reverseList.push(idRow*8 + j);
-        reverseFlag = false;
-      }
-    }
-
-    if (!reverseFlag) reverseList = [];
-    reverseFlag = true;
-
-    for (let j=idCol+1; j<8; j++) {
-      if (current[idRow*8 + j]===color) {
-        if (!reverseFlag) {
-          reverseFlag = !reverseFlag;
-        }
-        break;
-      } else if (current[idRow*8 + j]==null) {
-        break;
-      } else {
-        righter.push(idRow*8 + j);
-        reverseFlag = false;
-      }
-    }
-    if (!reverseFlag) righter = [];
-
-    for (let val of righter) {
-      reverseList.push(val);
-    }
-
-    return reverseList;
-  }
 
   checkReverse(i) {
     const current = this.state.current;
@@ -160,8 +122,8 @@ class Game extends React.Component {
     let putColor = this.state.xIsNext ? "X" : "O";
 
     let reverseList = [];
-    reverseList.push(this.checkCol(current, putColor, idCol, idRow));
-    reverseList.push(this.checkRow(current, putColor, idCol, idRow));
+    reverseList.push(this.checkCol(current, putColor, idCol, idRow, 'col'));
+    reverseList.push(this.checkCol(current, putColor, idCol, idRow, 'row'));
 
     return reverseList;
   }
