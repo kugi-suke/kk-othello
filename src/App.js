@@ -56,6 +56,9 @@ class Game extends React.Component {
     for (let point of reverse[0]) {
       squares[point] = squares[i];
     }
+    for (let point of reverse[1]) {
+      squares[point] = squares[i];
+    }
     this.setState({
       current: squares,
       xIsNext: !this.state.xIsNext
@@ -106,6 +109,50 @@ class Game extends React.Component {
     return reverseList;
   }
 
+  checkRow(current, color, idCol, idRow) {
+    let reverseFlag = true;
+    let righter = [];
+    let reverseList = [];
+
+    for (let j=idCol-1; j>=0; j--) {
+      if (current[idRow*8 + j]===color) {
+        if (!reverseFlag) {
+          reverseFlag = !reverseFlag;
+        }
+        break;
+      } else if (current[idRow*8 + j]==null) {
+        break;
+      } else {
+        reverseList.push(idRow*8 + j);
+        reverseFlag = false;
+      }
+    }
+
+    if (!reverseFlag) reverseList = [];
+    reverseFlag = true;
+
+    for (let j=idCol+1; j<8; j++) {
+      if (current[idRow*8 + j]===color) {
+        if (!reverseFlag) {
+          reverseFlag = !reverseFlag;
+        }
+        break;
+      } else if (current[idRow*8 + j]==null) {
+        break;
+      } else {
+        righter.push(idRow*8 + j);
+        reverseFlag = false;
+      }
+    }
+    if (!reverseFlag) righter = [];
+
+    for (let val of righter) {
+      reverseList.push(val);
+    }
+
+    return reverseList;
+  }
+
   checkReverse(i) {
     const current = this.state.current;
     let idCol = i%8;
@@ -114,6 +161,7 @@ class Game extends React.Component {
 
     let reverseList = [];
     reverseList.push(this.checkCol(current, putColor, idCol, idRow));
+    reverseList.push(this.checkRow(current, putColor, idCol, idRow));
 
     return reverseList;
   }
