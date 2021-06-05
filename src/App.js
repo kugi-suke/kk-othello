@@ -62,6 +62,9 @@ class Game extends React.Component {
     for (let point of reverse[2]) {
       squares[point] = squares[i];
     }
+    for (let point of reverse[3]) {
+      squares[point] = squares[i];
+    }
     this.setState({
       current: squares,
       xIsNext: !this.state.xIsNext
@@ -116,14 +119,23 @@ class Game extends React.Component {
     return reverseList;
   }
 
-  checkDiag(current, color, idCol, idRow) {
+  checkDiag(current, color, idCol, idRow, direction) {
     let reverseFlag = true;
     let downer = [];
     let reverseList = [];
 
-    let j=idRow-1;
-    let k=idCol+1;
-    while (j>=0 && k<8) {
+    let stepJ;
+    let stepK;
+    if (direction==='right') {
+      stepJ=-1;
+      stepK=1;
+    } else {
+      stepJ=-1;
+      stepK=-1;
+    }
+    let j=idRow+stepJ;
+    let k=idCol+stepK;
+    while (j>=0 && j<8 && k>=0 && k<8) {
       if (current[8*j+k]===color) {
         if (!reverseFlag) {
           reverseFlag = !reverseFlag;
@@ -135,15 +147,23 @@ class Game extends React.Component {
         reverseList.push(8*j+k);
         reverseFlag = false;
       }
-      j--;
-      k++;
+
+      j+=stepJ;
+      k+=stepK;
     }
     if (!reverseFlag) reverseList = [];
     reverseFlag = true;
 
-    j=idRow+1;
-    k=idCol-1;
-    while (j<8 && k>=0) {
+    if (direction==='right') {
+      stepJ=1;
+      stepK=-1;
+    } else {
+      stepJ=1;
+      stepK=1;
+    }
+    j=idRow+stepJ;
+    k=idCol+stepK;
+    while (j>=0 && j<8 && k>=0 && k<8) {
       if (current[8*j+k]===color) {
         if (!reverseFlag) {
           reverseFlag = !reverseFlag;
@@ -155,8 +175,8 @@ class Game extends React.Component {
         downer.push(8*j+k);
         reverseFlag = false;
       }
-      j++;
-      k--;
+      j+=stepJ;
+      k+=stepK;
     }
 
     if (!reverseFlag) downer = [];
@@ -177,7 +197,8 @@ class Game extends React.Component {
     let reverseList = [];
     reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'col'));
     reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'row'));
-    reverseList.push(this.checkDiag(current, putColor, idCol, idRow));
+    reverseList.push(this.checkDiag(current, putColor, idCol, idRow, 'right'));
+    reverseList.push(this.checkDiag(current, putColor, idCol, idRow, 'left'));
 
     return reverseList;
   }
