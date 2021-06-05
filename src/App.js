@@ -48,109 +48,91 @@ class Game extends React.Component {
   handleClick(i) {
     const current = this.state.current;
     const squares = current.slice();
-    const reverse = this.checkReverse(i);
-    if (calculateWinner(squares) || squares[i]) {
+    const reverse = this.reverse(i);
+    if (reverse[0][0]===undefined && reverse[1][0]===undefined && reverse[2][0]===undefined && reverse[3][0]===undefined) {
+      alert("You can't put here!");
+    } else {
+      squares[i] = this.state.xIsNext ? "X" : "O";
+      for (let j=0; j<4; j++) {
+        for (let point of reverse[j]) {
+          squares[point] = squares[i];
+        }
+      }
+
+      this.setState({
+        current: squares,
+        xIsNext: !this.state.xIsNext
+      });
+    }
+    /*if (calculateWinner(squares) || squares[i]) {
       return;
-    }
-    squares[i] = this.state.xIsNext ? "X" : "O";
-    for (let point of reverse[0]) {
-      squares[point] = squares[i];
-    }
-    for (let point of reverse[1]) {
-      squares[point] = squares[i];
-    }
-    for (let point of reverse[2]) {
-      squares[point] = squares[i];
-    }
-    for (let point of reverse[3]) {
-      squares[point] = squares[i];
-    }
-    this.setState({
+    }*/
+    //squares[i] = this.state.xIsNext ? "X" : "O";
+
+    /*for (let j=0; j<4; j++) {
+      for (let point of reverse[j]) {
+        squares[point] = squares[i];
+      }
+    }*/
+
+    /*this.setState({
       current: squares,
       xIsNext: !this.state.xIsNext
-    });
+    });*/
   }
 
-  reversePoint(current, color, idCol, idRow, direction) {
-    let reverseFlag = true;
+  reversePoint(current, color, point, vStep, hStep) {
     let reverseList = [];
-    let downer = [];
-    let stepJ;
-    let stepK;
+    let tmpList = [];
 
-    if (direction==='col') {
-      stepJ=0;
-      stepK=-1;
-    } else if (direction==='row') {
-      stepJ=-1;
-      stepK=0;
-    } else if (direction==='right') {
-      stepJ=-1;
-      stepK=1;
-    } else {
-      stepJ=-1;
-      stepK=-1;
-    }
-    let j=idRow+stepJ;
-    let k=idCol+stepK;
-    while (j>=0 && j<8 && k>=0 && k<8) {
-      if (current[8*j+k]===color) {
-        if (!reverseFlag) {
-          reverseFlag = !reverseFlag;
-        }
-        break;
-      } else if (current[8*j+k]==null) {
-        break;
-      } else {
-        reverseList.push(8*j+k);
-        reverseFlag = false;
-      }
+    reverseList = this.checkReverse(current, color, point, vStep, hStep);
 
-      j+=stepJ;
-      k+=stepK;
-    }
-    if (!reverseFlag) reverseList = [];
-    reverseFlag = true;
+    vStep*=-1;
+    hStep*=-1;
 
-    stepJ*=-1;
-    stepK*=-1;
-    j=idRow+stepJ;
-    k=idCol+stepK;
-    while (j>=0 && j<8 && k>=0 && k<8) {
-      if (current[8*j+k]===color) {
-        if (!reverseFlag) {
-          reverseFlag = !reverseFlag;
-        }
-        break;
-      } else if (current[8*j+k]==null) {
-        break;
-      } else {
-        downer.push(8*j+k);
-        reverseFlag = false;
-      }
-      j+=stepJ;
-      k+=stepK;
-    }
-    if (!reverseFlag) downer = [];
+    tmpList = this.checkReverse(current, color, point, vStep, hStep);
 
-    for (let val of downer) {
-      reverseList.push(val);
-    }
+    for (let val of tmpList) reverseList.push(val);
 
     return reverseList;
   }
 
-  checkReverse(i) {
+  checkReverse(current, color, point, vStep, hStep) {
+    let reverseFlag = true;
+    let reverseList = [];
+    let vPoint=(Math.floor(point/8))+vStep;
+    let hPoint=(point%8)+hStep;
+
+    while (vPoint>=0 && vPoint<8 && hPoint>=0 && hPoint<8) {
+      if (current[8*vPoint+hPoint]===color) {
+        if (!reverseFlag) {
+          reverseFlag = !reverseFlag;
+        }
+        break;
+      } else if (current[8*vPoint+hPoint]==null) {
+        break;
+      } else {
+        reverseList.push(8*vPoint+hPoint);
+        reverseFlag = false;
+      }
+
+      vPoint+=vStep;
+      hPoint+=hStep;
+    }
+
+    if (!reverseFlag) reverseList = [];
+    return reverseList;
+  }
+
+  reverse(i) {
     const current = this.state.current;
-    let idCol = i%8;
-    let idRow = Math.floor(i/8);
     let putColor = this.state.xIsNext ? "X" : "O";
 
     let reverseList = [];
-    reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'col'));
-    reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'row'));
-    reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'right'));
-    reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'left'));
+    reverseList.push(this.reversePoint(current, putColor, i, 0, -1));
+    reverseList.push(this.reversePoint(current, putColor, i, -1, 0));
+    reverseList.push(this.reversePoint(current, putColor, i, -1, 1));
+    reverseList.push(this.reversePoint(current, putColor, i, -1, -1));
 
     return reverseList;
   }
