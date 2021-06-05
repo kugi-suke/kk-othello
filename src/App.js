@@ -73,60 +73,18 @@ class Game extends React.Component {
 
   reversePoint(current, color, idCol, idRow, direction) {
     let reverseFlag = true;
-    let downer = [];
     let reverseList = [];
-    let point = null;
-    let axis = direction==='col' ? idRow : idCol;
-
-    for (let j=axis-1; j>=0; j--) {
-      point = direction==='col' ? j*8 + idCol : idRow*8 + j;
-      if (current[point]===color) {
-        if (!reverseFlag) {
-          reverseFlag = !reverseFlag;
-        }
-        break;
-      } else if (current[point]==null) {
-        break;
-      } else {
-        reverseList.push(point);
-        reverseFlag = false;
-      }
-    }
-
-    if (!reverseFlag) reverseList = [];
-    reverseFlag = true;
-
-    for (let j=axis+1; j<8; j++) {
-      point = direction==='col' ? j*8 + idCol : idRow*8 + j;
-      if (current[point]===color) {
-        if (!reverseFlag) {
-          reverseFlag = !reverseFlag;
-        }
-        break;
-      } else if (current[point]==null) {
-        break;
-      } else {
-        downer.push(point);
-        reverseFlag = false;
-      }
-    }
-    if (!reverseFlag) downer = [];
-
-    for (let val of downer) {
-      reverseList.push(val);
-    }
-
-    return reverseList;
-  }
-
-  checkDiag(current, color, idCol, idRow, direction) {
-    let reverseFlag = true;
     let downer = [];
-    let reverseList = [];
-
     let stepJ;
     let stepK;
-    if (direction==='right') {
+
+    if (direction==='col') {
+      stepJ=0;
+      stepK=-1;
+    } else if (direction==='row') {
+      stepJ=-1;
+      stepK=0;
+    } else if (direction==='right') {
       stepJ=-1;
       stepK=1;
     } else {
@@ -154,13 +112,8 @@ class Game extends React.Component {
     if (!reverseFlag) reverseList = [];
     reverseFlag = true;
 
-    if (direction==='right') {
-      stepJ=1;
-      stepK=-1;
-    } else {
-      stepJ=1;
-      stepK=1;
-    }
+    stepJ*=-1;
+    stepK*=-1;
     j=idRow+stepJ;
     k=idCol+stepK;
     while (j>=0 && j<8 && k>=0 && k<8) {
@@ -178,7 +131,6 @@ class Game extends React.Component {
       j+=stepJ;
       k+=stepK;
     }
-
     if (!reverseFlag) downer = [];
 
     for (let val of downer) {
@@ -197,8 +149,8 @@ class Game extends React.Component {
     let reverseList = [];
     reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'col'));
     reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'row'));
-    reverseList.push(this.checkDiag(current, putColor, idCol, idRow, 'right'));
-    reverseList.push(this.checkDiag(current, putColor, idCol, idRow, 'left'));
+    reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'right'));
+    reverseList.push(this.reversePoint(current, putColor, idCol, idRow, 'left'));
 
     return reverseList;
   }
