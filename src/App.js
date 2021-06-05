@@ -40,20 +40,12 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      /*history: [
-        {
-          squares: Array(8**2).fill(null)
-        }
-      ],
-      stepNumber: 0,*/
-      current: Array(8**2).fill(null),
+      current: initBoard(),
       xIsNext: true,
     };
   }
 
   handleClick(i) {
-    //const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    //const current = history[history.length - 1];
     const current = this.state.current;
     const squares = current.slice();
     if (calculateWinner(squares) || squares[i]) {
@@ -61,40 +53,14 @@ class Game extends React.Component {
     }
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
-      /*history: history.concat([  // 履歴の追加
-        {
-          squares: squares
-        }
-      ]),
-      stepNumber: history.length,*/
       current: squares,
       xIsNext: !this.state.xIsNext
     });
   }
 
-  /*jumpTo(step) {
-    this.setState({
-      stepNumber: step,
-      xIsNext: (step % 2) === 0
-    });
-  }*/
-
   render() {
-    //const history = this.state.history;
-    //const current = history[this.state.stepNumber];
     const current = this.state.current;
     const winner = calculateWinner(current);
-
-    /*const moves = history.map((step, move) => {
-      const desc = move ?
-        'Go to move #' + move :
-        'Go to game start';
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
-      );
-    });*/
 
     let status;
     if (winner) {
@@ -113,11 +79,21 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          {/*<ol>{moves}</ol>*/}
         </div>
       </div>
     );
   }
+}
+
+function initBoard() {
+  let board = Array(8**2).fill(null);
+
+  board[27] = 'X';
+  board[28] = 'O';
+  board[35] = 'O';
+  board[36] = 'X';
+
+  return board;
 }
 
 function calculateWinner(squares) {
