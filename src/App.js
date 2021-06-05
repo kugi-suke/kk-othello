@@ -64,6 +64,7 @@ class Game extends React.Component {
 
   checkCol(current, color, idCol, idRow) {
     let reverseFlag = true;
+    let downer = [];
     let reverseList = [];
 
     for (let j=idRow-1; j>=0; j--) {
@@ -80,7 +81,29 @@ class Game extends React.Component {
       }
     }
 
-    return reverseFlag ? reverseList : [];
+    if (!reverseFlag) reverseList = [];
+    reverseFlag = true;
+
+    for (let j=idRow+1; j<8; j++) {
+      if (current[j*8 + idCol]===color) {
+        if (!reverseFlag) {
+          reverseFlag = !reverseFlag;
+        }
+        break;
+      } else if (current[j*8 + idCol]==null) {
+        break;
+      } else {
+        downer.push(j*8 + idCol);
+        reverseFlag = false;
+      }
+    }
+    if (!reverseFlag) downer = [];
+
+    for (let val of downer) {
+      reverseList.push(val);
+    }
+
+    return reverseList;
   }
 
   checkReverse(i) {
