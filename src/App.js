@@ -42,6 +42,8 @@ class Game extends React.Component {
     this.state = {
       current: initBoard(),
       xIsNext: true,
+      numX: 2,
+      numO: 2,
     };
   }
 
@@ -50,34 +52,50 @@ class Game extends React.Component {
     const squares = current.slice();
     const color = this.state.xIsNext ? "X" : "O";
     const reverse = this.reverse(i, squares, color);
+    let counter = 0;
 
     if (squares[i]) {
       return;
     }
 
-    if (false) {
+    if (reverse[0][0]===undefined && reverse[1][0]===undefined && reverse[2][0]===undefined && reverse[3][0]===undefined) {
       alert("You can't put here!");
-    } else {
-      squares[i] = color;
-      for (let j=0; j<4; j++) {
-        for (let point of reverse[j]) {
-          squares[point] = squares[i];
-        }
-      }
+      return;
+    }
+    squares[i] = color;
 
-      this.setState({
-        current: squares,
-        //xIsNext: !this.state.xIsNext
-      });
-
-      if (this.nextIsPass(squares)) {
-        alert('pass!!');
-      } else {
-        this.setState({
-          xIsNext: !this.state.xIsNext,
-        });
+    for (let j=0; j<4; j++) {
+      for (let point of reverse[j]) {
+        squares[point] = squares[i];
+        counter++;
       }
     }
+
+    this.setState({
+      current: squares,
+      //xIsNext: !this.state.xIsNext
+    });
+
+    if (color==='X') {
+      this.setState({
+        numX: this.state.numX+counter+1,
+        numO: this.state.numO-counter,
+      });
+    } else {
+      this.setState({
+        numX: this.state.numX-counter,
+        numO: this.state.numO+counter+1,
+      });
+    }
+
+    if (this.nextIsPass(squares)) {
+      alert('pass!!');
+    } else {
+      this.setState({
+        xIsNext: !this.state.xIsNext,
+      });
+    }
+
     /*if (calculateWinner(squares) || squares[i]) {
       return;
     }*/
@@ -139,14 +157,7 @@ class Game extends React.Component {
   }
 
   reverse(i, current, color) {
-    //const current = this.state.current;
-    //let putColor = this.state.xIsNext ? "X" : "O";
-
     let reverseList = [];
-    /*reverseList.push(this.reversePoint(current, putColor, i, 0, -1));
-    reverseList.push(this.reversePoint(current, putColor, i, -1, 0));
-    reverseList.push(this.reversePoint(current, putColor, i, -1, 1));
-    reverseList.push(this.reversePoint(current, putColor, i, -1, -1));*/
     reverseList.push(this.reversePoint(current, color, i, 0, -1));
     reverseList.push(this.reversePoint(current, color, i, -1, 0));
     reverseList.push(this.reversePoint(current, color, i, -1, 1));
@@ -194,10 +205,14 @@ class Game extends React.Component {
     const winner = calculateWinner(current);
 
     let status;
+    let numX;
+    let numO;
     if (false) {
       status = "Winner: " + winner;
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+      numX = "Number of X: " + this.state.numX;
+      numO = "Number of O: " + this.state.numO;
     }
 
     return (
@@ -210,6 +225,8 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <div>{numX}</div>
+          <div>{numO}</div>
         </div>
       </div>
     );
