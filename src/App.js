@@ -49,12 +49,14 @@ class Game extends React.Component {
 
   handleClick(i) {
     const current = this.state.current;
+    const winner = this.judgeWinner(current, this.state.numX, this.state.numO);
     const squares = current.slice();
     const color = this.state.xIsNext ? "X" : "O";
+    const nextColor = this.state.xIsNext ? "O" : "X";
     const reverse = this.reverse(i, squares, color);
     let counter = 0;
 
-    if (squares[i]) {
+    if (winner || squares[i]) {
       return;
     }
 
@@ -73,7 +75,6 @@ class Game extends React.Component {
 
     this.setState({
       current: squares,
-      //xIsNext: !this.state.xIsNext
     });
 
     if (color==='X') {
@@ -88,29 +89,11 @@ class Game extends React.Component {
       });
     }
 
-    if (this.nextIsPass(squares)) {
-      alert('pass!!');
-    } else {
+    if (!this.isPass(squares, nextColor)) {
       this.setState({
         xIsNext: !this.state.xIsNext,
       });
     }
-
-    /*if (calculateWinner(squares) || squares[i]) {
-      return;
-    }*/
-    //squares[i] = this.state.xIsNext ? "X" : "O";
-
-    /*for (let j=0; j<4; j++) {
-      for (let point of reverse[j]) {
-        squares[point] = squares[i];
-      }
-    }*/
-
-    /*this.setState({
-      current: squares,
-      xIsNext: !this.state.xIsNext
-    });*/
   }
 
   reversePoint(current, color, point, vStep, hStep) {
@@ -166,8 +149,7 @@ class Game extends React.Component {
     return reverseList;
   }
 
-  nextIsPass(current) {
-    const color = this.state.xIsNext ? "O" : "X";
+  isPass(current, color) {
     let putMap = Array(8**2).fill(null);
     let reverse;
 
@@ -181,7 +163,7 @@ class Game extends React.Component {
 
     for (let i=1; i<7; i++) {
       for (let j=1; j<7; j++) {
-        if (current[i*8+j]!=null) {
+        if (current[i*8+j]) {
           for (let v=i-1; v<i+2; v++) {
             for (let h=j-1; h<j+2; h++) {
               if (!putMap[v*8+h]) {
@@ -200,19 +182,29 @@ class Game extends React.Component {
     return true;
   }
 
+  judgeWinner(current, numX, numO) {
+    if (this.isPass(current, 'X') && this.isPass(current, 'O')){
+      return numX>numO ? 'X' : 'O';
+    } else {
+      return null;
+    }
+  }
+
   render() {
     const current = this.state.current;
-    const winner = calculateWinner(current);
+    const winner = this.judgeWinner(current, this.state.numX, this.state.numO);
 
     let status;
-    let numX;
-    let numO;
-    if (false) {
+    let statusX;
+    let statusO;
+    if (winner) {
       status = "Winner: " + winner;
+      statusX = "Number of X: " + this.state.numX;
+      statusO = "Number of O: " + this.state.numO;
     } else {
       status = "Next player: " + (this.state.xIsNext ? "X" : "O");
-      numX = "Number of X: " + this.state.numX;
-      numO = "Number of O: " + this.state.numO;
+      statusX = "Number of X: " + this.state.numX;
+      statusO = "Number of O: " + this.state.numO;
     }
 
     return (
@@ -225,8 +217,8 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <div>{numX}</div>
-          <div>{numO}</div>
+          <div>{statusX}</div>
+          <div>{statusO}</div>
         </div>
       </div>
     );
@@ -242,26 +234,6 @@ function initBoard() {
   board[36] = 'X';
 
   return board;
-}
-
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
 }
 
 export default Game;
