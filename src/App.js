@@ -1,11 +1,18 @@
-//import logo from './logo.svg';
+import black from './black.png';
+import white from './white.png';
 import './App.css';
 import React from "react";
 
 function Square(props) {
+  let value=null;
+  if (props.value==='O') {
+    value = <img src={white} className="stone" alt="stone" />;
+  } else if (props.value==='X'){
+    value = <img src={black} className="stone" alt="stone" />;
+  }
   return (
     <button className="square" onClick={props.onClick}>
-      {props.value}
+      {value}
     </button>
   );
 }
@@ -41,7 +48,7 @@ class Game extends React.Component {
     super(props);
     this.state = {
       current: initBoard(),
-      xIsNext: true,
+      bIsNext: true,
       numX: 2,
       numO: 2,
     };
@@ -51,8 +58,8 @@ class Game extends React.Component {
     const current = this.state.current;
     const winner = this.judgeWinner(current, this.state.numX, this.state.numO);
     const squares = current.slice();
-    const color = this.state.xIsNext ? "X" : "O";
-    const nextColor = this.state.xIsNext ? "O" : "X";
+    const color = this.state.bIsNext ? "X" : "O";
+    const nextColor = this.state.bIsNext ? "O" : "X";
     const reverse = this.reverse(i, squares, color);
     let counter = 0;
 
@@ -91,7 +98,7 @@ class Game extends React.Component {
 
     if (!this.isPass(squares, nextColor)) {
       this.setState({
-        xIsNext: !this.state.xIsNext,
+        bIsNext: !this.state.bIsNext,
       });
     }
   }
@@ -184,7 +191,7 @@ class Game extends React.Component {
 
   judgeWinner(current, numX, numO) {
     if (this.isPass(current, 'X') && this.isPass(current, 'O')){
-      return numX>numO ? 'X' : 'O';
+      return numX>numO ? 'Black' : 'White';
     } else {
       return null;
     }
@@ -195,16 +202,16 @@ class Game extends React.Component {
     const winner = this.judgeWinner(current, this.state.numX, this.state.numO);
 
     let status;
-    let statusX;
-    let statusO;
+    let statusB;
+    let statusW;
     if (winner) {
       status = "Winner: " + winner;
-      statusX = "Number of X: " + this.state.numX;
-      statusO = "Number of O: " + this.state.numO;
+      statusB = "Black: " + this.state.numX;
+      statusW = "White: " + this.state.numO;
     } else {
-      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
-      statusX = "Number of X: " + this.state.numX;
-      statusO = "Number of O: " + this.state.numO;
+      status = "Next player: " + (this.state.bIsNext ? "Black" : "White");
+      statusB = "Black: " + this.state.numX;
+      statusW = "White: " + this.state.numO;
     }
 
     return (
@@ -217,8 +224,8 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <div>{statusX}</div>
-          <div>{statusO}</div>
+          <div>{statusB}</div>
+          <div>{statusW}</div>
         </div>
       </div>
     );
@@ -228,10 +235,10 @@ class Game extends React.Component {
 function initBoard() {
   let board = Array(8**2).fill(null);
 
-  board[27] = 'X';
-  board[28] = 'O';
-  board[35] = 'O';
-  board[36] = 'X';
+  board[27] = 'O';
+  board[28] = 'X';
+  board[35] = 'X';
+  board[36] = 'O';
 
   return board;
 }
