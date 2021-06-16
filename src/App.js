@@ -2,6 +2,31 @@ import black from './black.png';
 import white from './white.png';
 import './App.css';
 import React from "react";
+import firebase from 'firebase/app';
+import "firebase/firestore";
+import "firebase/auth";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyACwfLf5D52eIIS5YAiX7eSw1cf8y322vw",
+  authDomain: "kk-othello-2dd1c.firebaseapp.com",
+  projectId: "kk-othello-2dd1c",
+  storageBucket: "kk-othello-2dd1c.appspot.com",
+  messagingSenderId: "901984635778",
+  appId: "1:901984635778:web:3e66f2b6855ab437681d9b",
+  measurementId: "G-WCJH7DMF06"
+};
+
+let db = firebase.firestore(firebase.initializeApp(firebaseConfig));
+let uid = null;
+firebase.auth().signInAnonymously();
+firebase.auth().onAuthStateChanged(function (user) {
+  if (user) uid = user.uid;
+});
+
+let field = initBoard();
+let currentIsBlack = true;
+let counterX = 2;
+let counterO = 2;
 
 function Square(props) {
   let value=null;
@@ -47,11 +72,29 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      current: initBoard(),
+      current: field,
       bIsNext: true,
       numX: 2,
       numO: 2,
     };
+  }
+
+  componentDidMount() {
+    db.collection("actions").orderBy("createdAt", "desc").limit(1).onSnapshot((querySnapshot) =>  {
+      querySnapshot.forEach(function(doc) {
+          var data = doc.data();
+          field = JSON.parse(data.field);
+          currentIsBlack = data.nextIsBlack;
+          counterX = data.x;
+          counterO = data.o;
+      });
+      this.setState({
+        bIsNext: currentIsBlack,
+        current: field,
+        numX: counterX,
+        numO: counterO,
+      });
+    })
   }
 
   handleClick(i) {
@@ -61,7 +104,10 @@ class Game extends React.Component {
     const color = this.state.bIsNext ? "X" : "O";
     const nextColor = this.state.bIsNext ? "O" : "X";
     const reverse = this.reverse(i, squares, color);
+
     let counter = 0;
+    let numX = this.state.numX;
+    let numO = this.state.numO;
 
     if (winner || squares[i]) {
       return;
@@ -85,22 +131,31 @@ class Game extends React.Component {
     });
 
     if (color==='X') {
-      this.setState({
-        numX: this.state.numX+counter+1,
-        numO: this.state.numO-counter,
-      });
+      numX += counter+1;
+      numO -= counter;
     } else {
-      this.setState({
-        numX: this.state.numX-counter,
-        numO: this.state.numO+counter+1,
-      });
+      numX -= counter;
+      numO += counter+1;
     }
+    this.setState({
+      numX: numX,
+      numO: numO,
+    });
 
     if (!this.isPass(squares, nextColor)) {
       this.setState({
         bIsNext: !this.state.bIsNext,
       });
     }
+
+    db.collection("actions").add({
+      field: JSON.stringify(squares),
+      user: uid,
+      nextIsBlack: !this.state.bIsNext,
+      x: numX,
+      o: numO,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
   }
 
   reversePoint(current, color, point, vStep, hStep) {
@@ -195,6 +250,12 @@ class Game extends React.Component {
     } else {
       return null;
     }
+  }
+
+  setField(field) {
+    this.setState({
+      current: field,
+    });
   }
 
   render() {
