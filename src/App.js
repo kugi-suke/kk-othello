@@ -7,13 +7,13 @@ import "firebase/firestore";
 import "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyACwfLf5D52eIIS5YAiX7eSw1cf8y322vw",
-  authDomain: "kk-othello-2dd1c.firebaseapp.com",
-  projectId: "kk-othello-2dd1c",
-  storageBucket: "kk-othello-2dd1c.appspot.com",
-  messagingSenderId: "901984635778",
-  appId: "1:901984635778:web:3e66f2b6855ab437681d9b",
-  measurementId: "G-WCJH7DMF06"
+  apiKey: "xxxxx",
+  authDomain: "xxxxx",
+  projectId: "xxxxx",
+  storageBucket: "xxxxx",
+  messagingSenderId: "xxxxx",
+  appId: "xxxxx",
+  measurementId: "xxxxx"
 };
 
 let db = firebase.firestore(firebase.initializeApp(firebaseConfig));
