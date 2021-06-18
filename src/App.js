@@ -308,14 +308,17 @@ function initBoard() {
 }
 
 function initFirestore() {
-  db.collection("actions").add({
-    field: JSON.stringify(initBoard()),
-    user: uid,
-    nextIsBlack: true,
-    x: 2,
-    o: 2,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
+  let admin = prompt("please pass")=="admin" ? true : false;
+  if (admin) {
+    db.collection("actions").add({
+      field: JSON.stringify(initBoard()),
+      user: uid,
+      nextIsBlack: true,
+      x: 2,
+      o: 2,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
 }
 
 export default Game;
