@@ -7,13 +7,13 @@ import "firebase/firestore";
 import "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "xxxxx",
-  authDomain: "xxxxx",
-  projectId: "xxxxx",
-  storageBucket: "xxxxx",
-  messagingSenderId: "xxxxx",
-  appId: "xxxxx",
-  measurementId: "xxxxx"
+  apiKey: "AIzaSyACwfLf5D52eIIS5YAiX7eSw1cf8y322vw",
+  authDomain: "kk-othello-2dd1c.firebaseapp.com",
+  projectId: "kk-othello-2dd1c",
+  storageBucket: "kk-othello-2dd1c.appspot.com",
+  messagingSenderId: "901984635778",
+  appId: "1:901984635778:web:3e66f2b6855ab437681d9b",
+  measurementId: "G-WCJH7DMF06"
 };
 
 let db = firebase.firestore(firebase.initializeApp(firebaseConfig));
@@ -288,6 +288,9 @@ class Game extends React.Component {
           <div>{statusB}</div>
           <div>{statusW}</div>
         </div>
+      <div><button className="init-button" onClick={initFirestore}>
+        Initialize Game-Board
+      </button></div>
       </div>
     );
   }
@@ -302,6 +305,17 @@ function initBoard() {
   board[36] = 'O';
 
   return board;
+}
+
+function initFirestore() {
+  db.collection("actions").add({
+    field: JSON.stringify(initBoard()),
+    user: uid,
+    nextIsBlack: true,
+    x: 2,
+    o: 2,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
 }
 
 export default Game;
