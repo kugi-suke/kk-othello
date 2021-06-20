@@ -5,4 +5,5 @@
 ### [App](https://kk-othello-2dd1c.web.app/)
 
 JavaScript, React, firebase の練習で作成したオセロ
+
 ユーザー認証を用いた手番の管理はしていない
