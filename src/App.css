@@ -32,6 +32,10 @@ ol, ul {
   width: 34px;
 }
 
+.stone {
+  width: 80%;
+}
+
 .square:focus {
   outline: none;
 }

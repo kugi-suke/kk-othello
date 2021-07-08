@@ -308,7 +308,7 @@ function initBoard() {
 }
 
 function initFirestore() {
-  let admin = prompt("please pass")=="admin" ? true : false;
+  let admin = prompt("please pass")==="admin" ? true : false;
   if (admin) {
     db.collection("actions").add({
       field: JSON.stringify(initBoard()),
